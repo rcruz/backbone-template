@@ -35,6 +35,9 @@ module.exports = function (grunt) {
                 files: uglifyFiles
             }
         },
+        clean: { // Build related
+            all: ["coverage", "public"]
+        },
         sync: { // Build related
             main: {
                 files: [{
@@ -53,19 +56,20 @@ module.exports = function (grunt) {
                     debug: true
                 }
             }
+        },
+        karma: { // Test related: Test runner
+            unit: {
+                configFile: "karma.conf.js"
+            }
         }
     });
 
-    grunt.loadNpmTasks("grunt-contrib-jshint");
-    grunt.loadNpmTasks("grunt-browserify");
-    grunt.loadNpmTasks("grunt-contrib-uglify");
-    grunt.loadNpmTasks("grunt-contrib-connect");
-    grunt.loadNpmTasks("grunt-sync");
+    require("load-grunt-tasks")(grunt);
 
     grunt.registerTask("lint", ["jshint"]);
-    grunt.registerTask("test", ["lint"]);
-    grunt.registerTask("build", ["test", "browserify:vendor", "browserify:app", "sync:main"]);
+    grunt.registerTask("build", ["clean", "lint", "browserify:vendor", "browserify:app", "sync:main"]);
     grunt.registerTask("build:release", ["build", "uglify:release"]);
+    grunt.registerTask("test", ["build", "karma:unit"]);
     grunt.registerTask("serve", ["connect:server"]);
 
     grunt.registerTask("default", ["build"]);
